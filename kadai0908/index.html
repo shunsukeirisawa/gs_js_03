@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8" />
+  <title>営業ヨミ表アプリ</title>
+<style>
+
+body{
+  /* background-color: orange; */
+}
+
+.item{
+  text-align: center;
+  margin: 10px;
+}
+
+.wrap{
+  display:flex;
+  text-align: center;
+}
+
+
+</style>
+</head>
+
+<body>
+  <!-- コンテンツ表示画面 -->
+
+<h1>営業ヨミ表アプリ</h1>
+<div  class="wrap">
+
+  <div class="item">
+    <!-- 確度 -->
+    確度
+    <input type="text" list="accuracy" id="username">
+    <datalist id="accuracy">
+      <option value="Aヨミ"></option>
+      <option value="Bヨミ"></option>
+      <option value="Cヨミ"></option>
+      <option value="ネタ"></option>     
+    </datalist>
+  </div>
+
+  <div class="item">
+    <!-- 金額 -->
+    金額
+    <input type="text" id="text">
+  </div>
+
+  <div class="item">
+    <!-- 申込日 -->
+    申込日
+    <input type="date" id="applicationdate">
+  </div>
+
+  <div class="item">
+    <!-- 登録ボタン -->
+    <button id="send">登録</button>
+  </div>
+
+</div>
+
+  <div>
+    <!-- 保存されたデータが表示される箇所 -->
+    <div id="output"></div>
+  </div>　　　　
+
+
+
+  <!--/ コンテンツ表示画面 -->
+
+  <!-- JQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <!-- JQuery -->
+
+  <!--** 以下Firebase **-->
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <!-- 6.6.1に該当する箇所はfirebaseのバージョンですので更新されるたびに随時変わります🤗 -->
+  <script src="https://www.gstatic.com/firebasejs/6.6.1/firebase.js"></script>
+
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#config-web-app -->
+
+  <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+
+      apiKey: "",
+      authDomain: "",
+      databaseURL: "",
+      projectId: "",
+      storageBucket: "",
+      messagingSenderId: "",
+      appId: ""
+
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    //firebaseのデーターベース（保存させる場所）を使いますよ
+    const newPostRef = firebase.database().ref();
+
+
+    // ここから下にjqueryの処理を書いて練習します
+
+    // 送信ボタンをクリックされたら次の処理をする
+    $("#send").on("click", function () {
+      // alert(111)
+      newPostRef.push({
+        username:$("#username").val(),
+        text: $("#text").val(),
+        applicationdate: $("#applicationdate").val(),
+      })
+      $("#text").val("");
+      $("#username").val("");
+      $("#applicationdate").val("");  
+    });
+
+    // 受信処理
+    newPostRef.on("child_added", function (data) {
+      let v = data.val();
+      let k = data.key;
+      console.log(k,'keyのこと！');
+      console.log(v,'dddd');
+
+      let str = `<p>${v.username} ${v.text} ${v.applicationdate}</p>`;
+
+      $("#output").prepend(str);
+    })
+
+    $("#text").on("keydown", function (e) {
+      console.log(e, 'eventの塊だよ〜！！');
+      console.log(e.key, 'key')
+      console.log(e.keyCode, 'keycode')
+
+
+
+      if(e.keyCode === 13){
+        // 上で記述した送信処理をコピペで持ってくる
+         // データを登録で送る
+        newPostRef.push({
+          username: $("#username").val(), //名前
+          text: $("#text").val(), //テキストエリア
+        })
+        $("#text").val(""); //空にする
+        // 追加で記述
+        $('#username').val("") //空にする
+        $('#applicationdate').val("") //空にする
+      }
+
+
+    })
+  </script>
+</body>
+
+</html>
